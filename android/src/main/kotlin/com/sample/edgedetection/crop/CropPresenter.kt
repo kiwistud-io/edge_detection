@@ -27,7 +27,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 
- val IMAGES_DIR = "app_flutter"
+const val IMAGES_DIR = "app_flutter"
 // const val IMAGES_DIR = "smart_scanner"
 
 class CropPresenter(val context: Context, private val iCropView: ICropView.Proxy) {
