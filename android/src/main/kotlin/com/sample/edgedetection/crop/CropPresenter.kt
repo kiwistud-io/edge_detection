@@ -164,7 +164,7 @@ class CropPresenter(val context: Context, private val iCropView: ICropView.Proxy
             Toast.makeText(context, "please grant write file permission and try again", Toast.LENGTH_SHORT).show()
         } else {
             val dir = File(context.getCacheDir(), IMAGES_DIR)
-            Log("dir "+ dir);
+            print("dir = $dir");
             if (!dir.exists()) {
                 dir.mkdirs()
             }
