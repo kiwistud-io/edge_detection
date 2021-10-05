@@ -27,7 +27,7 @@ import java.io.File
 import java.io.FileOutputStream
 
 
- val IMAGES_DIR = "app_flutter/temp"
+ val IMAGES_DIR = "app_flutter"
 // const val IMAGES_DIR = "smart_scanner"
 
 class CropPresenter(val context: Context, private val iCropView: ICropView.Proxy) {
@@ -163,7 +163,7 @@ class CropPresenter(val context: Context, private val iCropView: ICropView.Proxy
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, "please grant write file permission and try again", Toast.LENGTH_SHORT).show()
         } else {
-            val dir = File(Environment.getExternalStorageDirectory(), IMAGES_DIR)
+            val dir = File(getCacheDir(), IMAGES_DIR)
             if (!dir.exists()) {
                 dir.mkdirs()
             }
