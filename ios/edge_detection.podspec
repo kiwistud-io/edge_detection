@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'edge_detection'
-  s.version          = '1.0.6'
+  s.version          = '1.0.7'
   s.summary          = 'Plugin to detect edges of objects'
   s.description      = <<-DESC
 Plugin to detect edges of objects
@@ -12,6 +12,7 @@ Plugin to detect edges of objects
   s.homepage         = 'http://example.com'
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Your Company' => 'email@example.com' }
+  s.resources        = 'Assets/**/*'
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'

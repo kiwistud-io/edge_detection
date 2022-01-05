@@ -8,20 +8,20 @@ import android.util.DisplayMetrics
 import android.util.Log
 import android.view.MotionEvent
 import android.view.View
-import com.sample.edgedetection.SourceManager
 import com.sample.edgedetection.processor.Corners
 import com.sample.edgedetection.processor.TAG
 import org.opencv.core.Point
 import org.opencv.core.Size
+import kotlin.math.abs
 
 
 class PaperRectangle : View {
     constructor(context: Context) : super(context)
     constructor(context: Context, attributes: AttributeSet) : super(context, attributes)
     constructor(context: Context, attributes: AttributeSet, defTheme: Int) : super(
-        context,
-        attributes,
-        defTheme
+            context,
+            attributes,
+            defTheme
     )
 
     private val rectPaint = Paint()
@@ -39,16 +39,16 @@ class PaperRectangle : View {
     private var latestDownY = 0.0F
 
     init {
-        rectPaint.color = Color.WHITE
+        rectPaint.color = Color.argb(128, 255, 255, 255)
         rectPaint.isAntiAlias = true
         rectPaint.isDither = true
         rectPaint.strokeWidth = 6F
-        rectPaint.style = Paint.Style.STROKE
+        rectPaint.style = Paint.Style.FILL_AND_STROKE
         rectPaint.strokeJoin = Paint.Join.ROUND    // set the join to round you want
         rectPaint.strokeCap = Paint.Cap.ROUND      // set the paint cap to round too
         rectPaint.pathEffect = CornerPathEffect(10f)
 
-        circlePaint.color = Color.LTGRAY
+        circlePaint.color = Color.WHITE
         circlePaint.isDither = true
         circlePaint.isAntiAlias = true
         circlePaint.strokeWidth = 4F
@@ -56,6 +56,7 @@ class PaperRectangle : View {
     }
 
     fun onCornersDetected(corners: Corners) {
+
         ratioX = corners.size.width.div(measuredWidth)
         ratioY = corners.size.height.div(measuredHeight)
         tl = corners.corners[0] ?: Point()
@@ -81,19 +82,24 @@ class PaperRectangle : View {
     }
 
     fun onCorners2Crop(corners: Corners?, size: Size?) {
+        if (size == null) {
+            return
+        }
 
         cropMode = true
-        tl = corners?.corners?.get(0) ?: SourceManager.defaultTl
-        tr = corners?.corners?.get(1) ?: SourceManager.defaultTr
-        br = corners?.corners?.get(2) ?: SourceManager.defaultBr
-        bl = corners?.corners?.get(3) ?: SourceManager.defaultBl
+        tl = corners?.corners?.get(0) ?: Point(size.width * 0.1, size.height * 0.1)
+        tr = corners?.corners?.get(1) ?: Point(size.width * 0.9, size.height * 0.1)
+        br = corners?.corners?.get(2) ?: Point(size.width * 0.9, size.height * 0.9)
+        bl = corners?.corners?.get(3) ?: Point(size.width * 0.1, size.height * 0.9)
         val displayMetrics = DisplayMetrics()
         (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
         //exclude status bar height
         val statusBarHeight = getStatusBarHeight(context)
+        //exclude navigation bar height
         val navigationBarHeight = getNavigationBarHeight(context)
         ratioX = size?.width?.div(displayMetrics.widthPixels) ?: 1.0
-        ratioY = size?.height?.div(displayMetrics.heightPixels - statusBarHeight - navigationBarHeight) ?: 1.0
+        ratioY = size?.height?.div(displayMetrics.heightPixels - statusBarHeight - navigationBarHeight)
+                ?: 1.0
         resize()
         movePoints()
     }
@@ -105,7 +111,17 @@ class PaperRectangle : View {
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
+
+        rectPaint.color = Color.WHITE
+        rectPaint.strokeWidth = 6F
+        rectPaint.style = Paint.Style.STROKE
         canvas?.drawPath(path, rectPaint)
+
+        rectPaint.color = Color.argb(128, 255, 255, 255)
+        rectPaint.strokeWidth = 0F
+        rectPaint.style = Paint.Style.FILL
+        canvas?.drawPath(path, rectPaint)
+
         if (cropMode) {
             canvas?.drawCircle(tl.x.toFloat(), tl.y.toFloat(), 20F, circlePaint)
             canvas?.drawCircle(tr.x.toFloat(), tr.y.toFloat(), 20F, circlePaint)
@@ -138,7 +154,8 @@ class PaperRectangle : View {
 
     private fun calculatePoint2Move(downX: Float, downY: Float) {
         val points = listOf(tl, tr, br, bl)
-        point2Move = points.minBy { Math.abs((it.x - downX).times(it.y - downY)) } ?: tl
+        point2Move = points.minByOrNull { abs((it.x - downX).times(it.y - downY)) }
+                ?: tl
     }
 
     private fun movePoints() {
