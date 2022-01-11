@@ -1,9 +1,9 @@
 package com.sample.edgedetection.crop
-
 import android.app.Activity
 import android.content.Intent
 import android.util.Log
 import android.view.Menu
+import android.view.View
 import android.view.MenuItem
 import android.widget.ImageView
 import androidx.appcompat.content.res.AppCompatResources
@@ -21,6 +21,36 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
     private lateinit var mPresenter: CropPresenter
 
     override fun prepare() {
+          t1.setOnClickListener {
+            finish()
+        }
+          t2.setOnClickListener {
+              if(showMenuItems){
+                  //true면 완료 동작으로 변경.
+                  val path = mPresenter.save()
+                  setResult(Activity.RESULT_OK, Intent().putExtra(SCANNED_RESULT, path))
+                  System.gc()
+                  finish()
+
+              }else{
+                  mPresenter.crop()
+                  changeMenuVisibility(true)
+              }
+
+        }
+          t3.setOnClickListener {
+            mPresenter.rotate()
+        }
+          t4.setOnClickListener {
+            mPresenter.rotateRight()
+        }
+//          t5.setOnClickListener {
+//            val path = mPresenter.save()
+//                setResult(Activity.RESULT_OK, Intent().putExtra(SCANNED_RESULT, path))
+//                System.gc()
+//                finish()
+//
+//        }
         /*proceed.setOnClickListener {
             var path = mPresenter.proceed()
             setResult(Activity.RESULT_OK, Intent().putExtra(SCANNED_RESULT, path))
@@ -59,12 +89,24 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
         return super.onCreateOptionsMenu(menu)
     }
 
-
+fun showHide(view:View) {
+    view.visibility = if (view.visibility == View.VISIBLE){
+        View.INVISIBLE
+    } else{
+        View.VISIBLE
+    }
+}
     private fun changeMenuVisibility(showMenuItems: Boolean) {
         this.showMenuItems = showMenuItems
         invalidateOptionsMenu()
+          if(showMenuItems){
+//              showHide(layout_crop_edge)
+              showHide(layout_crop_done)
+        }
+
     }
 
+  
     // handle button activities
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 

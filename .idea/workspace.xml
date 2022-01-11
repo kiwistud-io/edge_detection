@@ -5,9 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9d9dab75-21c4-4361-bb5f-2b085f5c5178" name="Changes" comment="">
+<<<<<<< Updated upstream
       <change afterPath="$PROJECT_DIR$/android/src/main/res/drawable/ic_lp_menu_album.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/src/main/res/drawable/ic_littlepicasso_gallery.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/res/drawable/ic_lp_menu_gallery.xml" afterDir="false" />
+=======
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" beforeDir="false" afterPath="$PROJECT_DIR$/android/gradle/wrapper/gradle-wrapper.properties" afterDir="false" />
+>>>>>>> Stashed changes
       <change beforePath="$PROJECT_DIR$/android/src/main/res/layout/activity_scan.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/res/layout/activity_scan.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
