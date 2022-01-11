@@ -21,10 +21,10 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
     private lateinit var mPresenter: CropPresenter
 
     override fun prepare() {
-          t1.setOnClickListener {
+          reshut.setOnClickListener {
             finish()
         }
-          t2.setOnClickListener {
+          next_and_done.setOnClickListener {
               if(showMenuItems){
                   //true면 완료 동작으로 변경.
                   val path = mPresenter.save()
@@ -38,19 +38,12 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
               }
 
         }
-          t3.setOnClickListener {
+          rotation_left.setOnClickListener {
             mPresenter.rotate()
         }
-          t4.setOnClickListener {
+          rotation_right.setOnClickListener {
             mPresenter.rotateRight()
         }
-//          t5.setOnClickListener {
-//            val path = mPresenter.save()
-//                setResult(Activity.RESULT_OK, Intent().putExtra(SCANNED_RESULT, path))
-//                System.gc()
-//                finish()
-//
-//        }
         /*proceed.setOnClickListener {
             var path = mPresenter.proceed()
             setResult(Activity.RESULT_OK, Intent().putExtra(SCANNED_RESULT, path))
@@ -100,8 +93,8 @@ fun showHide(view:View) {
         this.showMenuItems = showMenuItems
         invalidateOptionsMenu()
           if(showMenuItems){
-//              showHide(layout_crop_edge)
               showHide(layout_crop_done)
+              next_and_done.text="완료"
         }
 
     }
