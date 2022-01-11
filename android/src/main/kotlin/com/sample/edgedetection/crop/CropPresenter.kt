@@ -40,6 +40,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
     private var croppedBitmap: Bitmap? = null
     private var rotateBitmap: Bitmap? = null
     private var rotateBitmapDegree: Int = -90
+    private var rotateBitmapDegreeR: Int = 90
 
     init {
         val bitmap = Bitmap.createBitmap(picture?.width() ?: 1080, picture?.height()
@@ -191,6 +192,31 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         enhancedPicture = rotateBitmap
         croppedBitmap = croppedBitmap?.rotateInt(rotateBitmapDegree)
     }
+      fun rotateRight() {
+        if (croppedBitmap == null && enhancedPicture == null) {
+            Log.i(TAG, "picture null?")
+            return
+        }
+
+        if (enhancedPicture != null && rotateBitmap == null) {
+            Log.i(TAG, "enhancedPicture ***** TRUE")
+            rotateBitmap = enhancedPicture
+        }
+
+        if (rotateBitmap == null) {
+            Log.i(TAG, "rotateBitmap ***** TRUE")
+            rotateBitmap = croppedBitmap
+        }
+
+        Log.i(TAG, "ROTATEBITMAPDEGREE --> $rotateBitmapDegreeR")
+
+        rotateBitmap = rotateBitmap?.rotateInt(rotateBitmapDegreeR)
+
+        iCropView.getCroppedPaper().setImageBitmap(rotateBitmap)
+
+        enhancedPicture = rotateBitmap
+        croppedBitmap = croppedBitmap?.rotateInt(rotateBitmapDegreeR)
+    }
 
     fun proceed(): String? {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
@@ -240,15 +266,15 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
                 dir.mkdirs()
             }
 
-//            if(rotateBitmap != null) {
-//                if (enhancedPicture != null) {
-//                    enhancedPicture = rotateBitmap
-//                    Log.i(TAG, "enhancedPicture Changed")
-//                } else if(croppedBitmap != null){
-//                    croppedBitmap = rotateBitmap
-//                    Log.i(TAG, "rotateBitmap Changed")
-//                }
-//            }
+                //            if(rotateBitmap != null) {
+                //                if (enhancedPicture != null) {
+                //                    enhancedPicture = rotateBitmap
+                //                    Log.i(TAG, "enhancedPicture Changed")
+                //                } else if(croppedBitmap != null){
+                //                    croppedBitmap = rotateBitmap
+                //                    Log.i(TAG, "rotateBitmap Changed")
+                //                }
+                //            }
 
             val rotatePic = rotateBitmap
             if (null != rotatePic) {
