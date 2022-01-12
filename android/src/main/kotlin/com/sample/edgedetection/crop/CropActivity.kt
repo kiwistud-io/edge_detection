@@ -21,7 +21,7 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
     private lateinit var mPresenter: CropPresenter
 
     override fun prepare() {
-          reshut.setOnClickListener {
+          retake.setOnClickListener {
             finish()
         }
           next_and_done.setOnClickListener {
@@ -94,7 +94,8 @@ fun showHide(view:View) {
         invalidateOptionsMenu()
           if(showMenuItems){
               showHide(layout_crop_done)
-              next_and_done.text="완료"
+              var str : String = getString(R.string.done)
+              next_and_done.text=str
         }
 
     }
