@@ -45,23 +45,51 @@
             android:gravity="center_vertical|center_horizontal"
             android:visibility="invisible"
             >
-            <ImageView
+            <LinearLayout
                 android:id="@+id/rotation_left"
-                android:layout_width="54dp"
+                android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitXY"
-                android:layout_marginRight="60dp"
-                app:srcCompat="@drawable/ic_lp_rotation_left"
-                />
-            <ImageView
+                android:orientation="vertical"
+                android:layout_marginEnd="60dp"
+                >
+                <ImageView
+                    android:layout_width="18.88dp"
+                    android:layout_height="18.88dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@drawable/ic_lp_turn_left_arrow"
+                    android:layout_gravity="center"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/turn_left"
+                    android:textSize="17sp"
+                    android:textColor="#aaaaaa"
+                    />
+            </LinearLayout>
+            <LinearLayout
                 android:id="@+id/rotation_right"
-                android:layout_width="54dp"
+                android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                android:adjustViewBounds="true"
-                android:scaleType="fitXY"
-                app:srcCompat="@drawable/ic_lp_rotation_right"
-                />
+                android:orientation="vertical"
+                android:gravity="center_horizontal"
+                >
+                <ImageView
+                    android:layout_width="18.88dp"
+                    android:layout_height="18.88dp"
+                    android:adjustViewBounds="true"
+                    android:scaleType="fitXY"
+                    app:srcCompat="@drawable/ic_lp_turn_right_arrow"
+                    />
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/turn_right"
+                    android:textSize="17sp"
+                    android:textColor="#aaaaaa"
+                    />
+            </LinearLayout>
         </LinearLayout>
 
         <LinearLayout
@@ -74,14 +102,14 @@
             >
 
             <Button
-                android:id="@+id/reshut"
+                android:id="@+id/retake"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:background="#CCCCCC"
-                android:text="재촬영"
+                android:text="@string/retake"
                 android:textSize="16dp"
                 android:textStyle="bold"
                 />
@@ -94,7 +122,7 @@
                 android:background="#1CBF94"
                 android:minHeight="0dp"
                 android:minWidth="0dp"
-                android:text="다음"
+                android:text="@string/next"
                 android:textSize="16dp"
                 android:textStyle="bold"
                 />
