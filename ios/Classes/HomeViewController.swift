@@ -1,6 +1,7 @@
 import WeScan
 import Flutter
 import Foundation
+import UIKit
 
 class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, ImageScannerControllerDelegate {
     func captureImageFailWithError(error: Error) {
@@ -48,36 +49,77 @@ class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, Ima
             }
             
             present(cameraController, animated: true) {
+                
                 if let window = UIApplication.shared.keyWindow {
+//                    let tabBarController = UITabBarController()
+//                    tabBarController.tabBar.addSubview(self.shutterButton)
+//                    tabBarController.tabBar.addSubview(self.selectPhotoButton)
+//                    window.rootViewController = tabBarController
+//                    let rect = CGRect(x: 0, y: 0, width: 500, height: 100)
+//                    let myv:UIView = .init(frame: rect)
+//                    window.addSubview(myv)
+                    window.addSubview(self.topContainerView)
+                    window.addSubview(self.containerView)
                     window.addSubview(self.selectPhotoButton)
                     window.addSubview(self.shutterButton)
                     window.addSubview(self.cancelButton)
+                    
                     self.setupConstraints()
                 }
             }
         }
     }
     
-    private lazy var shutterButton: ShutterButton = {
-        let button = ShutterButton()
+    private lazy var containerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.white
+        view.sizeToFit()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+        }()
+    
+    private lazy var topContainerView: UIView = {
+        let view = UIView()
+        view.backgroundColor = UIColor.white
+        view.sizeToFit()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+        }()
+    
+    
+    //촬영버튼
+    private lazy var shutterButton: UIButton = {
+        let button = UIButton()
+        button.setImage(UIImage(named: "camera", in: Bundle(for: SwiftEdgeDetectionPlugin.self), compatibleWith: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(captureImage(_:)), for: .touchUpInside)
         return button
     }()
     
-    
+    //취소버튼
     private lazy var cancelButton: UIButton = {
         let button = UIButton()
-        button.setTitle(NSLocalizedString("wescan.scanning.cancel", tableName: nil, bundle: Bundle(for: ScannerViewController.self), value: "Cancel", comment: "The cancel button"), for: .normal)
+        button.setImage(UIImage(named: "back", in: Bundle(for: SwiftEdgeDetectionPlugin.self), compatibleWith: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
+        button.setTitle(NSLocalizedString("cancel", tableName: nil, bundle: Bundle(for: ScannerViewController.self), value: " Back", comment: "The cancel button"), for: .normal)
+        button.setTitleColor(.gray, for: .normal)
         button.translatesAutoresizingMaskIntoConstraints = false
         button.addTarget(self, action: #selector(cancelImageScannerController), for: .touchUpInside)
         return button
     }()
     
+    //앨범버튼
     lazy var selectPhotoButton: UIButton = {
         let button = UIButton()
-        button.setImage(UIImage(named: "gallery", in: Bundle(for: SwiftEdgeDetectionPlugin.self), compatibleWith: nil)?.withRenderingMode(.alwaysTemplate), for: .normal)
-        button.tintColor = UIColor.white
+        //버튼 이미지 세팅
+        
+        button.setImage(UIImage(named: "album", in: Bundle(for: SwiftEdgeDetectionPlugin.self), compatibleWith: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
+        // button.tintColor = UIColor.white
+//        button.imageEdgeInsets = UIEdgeInsets(top: 50, left: 50, bottom: 50, right: 50)
+//        button.imageEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
+        button.contentMode = .scaleToFill
+        button.frame.size.width = 50
+        button.frame.size.height = 50
+        
         button.addTarget(self, action: #selector(selectPhoto), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
         return button
@@ -116,6 +158,8 @@ class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, Ima
         cancelButton.isHidden = true
         selectPhotoButton.isHidden = true
         shutterButton.isHidden = true
+        containerView.isHidden = true
+        topContainerView.isHidden=true
     }
     
     private func setupConstraints() {
@@ -126,37 +170,48 @@ class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, Ima
             shutterButton.widthAnchor.constraint(equalToConstant: 65.0),
             shutterButton.heightAnchor.constraint(equalToConstant: 65.0)
         ]
+        let containerViewConstraints = [
+            containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            containerView.widthAnchor.constraint(equalToConstant: 500.0),
+            containerView.heightAnchor.constraint(equalToConstant: 100.0)
+        ]
+        let topContainerViewConstraints = [
+            topContainerView.widthAnchor.constraint(equalToConstant: 500.0),
+            topContainerView.heightAnchor.constraint(equalToConstant: 83.0)
+        ]
         
         if #available(iOS 11.0, *) {
             selectPhotoButtonConstraints = [
                 selectPhotoButton.widthAnchor.constraint(equalToConstant: 44.0),
                 selectPhotoButton.heightAnchor.constraint(equalToConstant: 44.0),
                 selectPhotoButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -24.0),
-                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
+                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant: (65.0  / 2) - 5.0)
             ]
             cancelButtonConstraints = [
                 cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24.0),
-                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
+                view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: cancelButton.topAnchor, constant: (65.0 / 2) - 20.0)
+//                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 5.0)
             ]
             
-            let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
+            let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 20.0)
             shutterButtonConstraints.append(shutterButtonBottomConstraint)
         } else {
             selectPhotoButtonConstraints = [
                 selectPhotoButton.widthAnchor.constraint(equalToConstant: 44.0),
                 selectPhotoButton.heightAnchor.constraint(equalToConstant: 44.0),
                 selectPhotoButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -24.0),
-                view.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
+                view.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant: (65.0 / 2) - 5.0)
             ]
             cancelButtonConstraints = [
                 cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24.0),
-                view.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 10.0)
+                view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: cancelButton.topAnchor, constant: (65.0 / 2) - 20.0)
+//                view.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 5.0)
             ]
             
-            let shutterButtonBottomConstraint = view.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 8.0)
+            let shutterButtonBottomConstraint = view.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 20.0)
             shutterButtonConstraints.append(shutterButtonBottomConstraint)
         }
-        NSLayoutConstraint.activate(selectPhotoButtonConstraints + cancelButtonConstraints + shutterButtonConstraints)
+        NSLayoutConstraint.activate(selectPhotoButtonConstraints + cancelButtonConstraints + shutterButtonConstraints + containerViewConstraints + topContainerViewConstraints)
     }
     
     func imageScannerController(_ scanner: ImageScannerController, didFailWithError error: Error) {
