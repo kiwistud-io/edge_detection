@@ -51,13 +51,6 @@ class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, Ima
             present(cameraController, animated: true) {
                 
                 if let window = UIApplication.shared.keyWindow {
-//                    let tabBarController = UITabBarController()
-//                    tabBarController.tabBar.addSubview(self.shutterButton)
-//                    tabBarController.tabBar.addSubview(self.selectPhotoButton)
-//                    window.rootViewController = tabBarController
-//                    let rect = CGRect(x: 0, y: 0, width: 500, height: 100)
-//                    let myv:UIView = .init(frame: rect)
-//                    window.addSubview(myv)
                     window.addSubview(self.topContainerView)
                     window.addSubview(self.containerView)
                     window.addSubview(self.selectPhotoButton)
@@ -113,9 +106,6 @@ class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, Ima
         //버튼 이미지 세팅
         
         button.setImage(UIImage(named: "album", in: Bundle(for: SwiftEdgeDetectionPlugin.self), compatibleWith: nil)?.withRenderingMode(.alwaysOriginal), for: .normal)
-        // button.tintColor = UIColor.white
-//        button.imageEdgeInsets = UIEdgeInsets(top: 50, left: 50, bottom: 50, right: 50)
-//        button.imageEdgeInsets = UIEdgeInsetsMake(20, 20, 20, 20)
         button.contentMode = .scaleToFill
         button.frame.size.width = 50
         button.frame.size.height = 50
@@ -162,18 +152,18 @@ class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, Ima
         topContainerView.isHidden=true
     }
     
+
+    
     private func setupConstraints() {
         var cancelButtonConstraints = [NSLayoutConstraint]()
         var selectPhotoButtonConstraints = [NSLayoutConstraint]()
         var shutterButtonConstraints = [
-            shutterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
-            shutterButton.widthAnchor.constraint(equalToConstant: 65.0),
-            shutterButton.heightAnchor.constraint(equalToConstant: 65.0)
-        ]
+            NSLayoutConstraint
+        ]()
         let containerViewConstraints = [
             containerView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
             containerView.widthAnchor.constraint(equalToConstant: 500.0),
-            containerView.heightAnchor.constraint(equalToConstant: 100.0)
+            containerView.heightAnchor.constraint(equalToConstant: 117.0)
         ]
         let topContainerViewConstraints = [
             topContainerView.widthAnchor.constraint(equalToConstant: 500.0),
@@ -181,35 +171,52 @@ class HomeViewController: UIViewController, CameraScannerViewOutputDelegate, Ima
         ]
         
         if #available(iOS 11.0, *) {
+
+           let window = UIApplication.shared.keyWindow
+            let bottomPadding: CGFloat = (window?.safeAreaInsets.bottom ?? 0)!
+            
+            
             selectPhotoButtonConstraints = [
                 selectPhotoButton.widthAnchor.constraint(equalToConstant: 44.0),
                 selectPhotoButton.heightAnchor.constraint(equalToConstant: 44.0),
-                selectPhotoButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -24.0),
-                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant: (65.0  / 2) - 5.0)
+                selectPhotoButton.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -61.5),
+                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant: ((117.0 - bottomPadding) - 44.0) / 2)
             ]
             cancelButtonConstraints = [
                 cancelButton.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 24.0),
                 view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: cancelButton.topAnchor, constant: (65.0 / 2) - 20.0)
-//                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 5.0)
             ]
-            
-            let shutterButtonBottomConstraint = view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 20.0)
-            shutterButtonConstraints.append(shutterButtonBottomConstraint)
+            shutterButtonConstraints = [
+                shutterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                shutterButton.widthAnchor.constraint(equalToConstant: 65.0),
+                shutterButton.heightAnchor.constraint(equalToConstant: 65.0),
+                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.safeAreaLayoutGuide.bottomAnchor, constant: ((117.0 - bottomPadding) - 65.0) / 2)
+            ]
+        
         } else {
+            
+            let window = UIApplication.shared.windows.first
+//            let topPadding: CGFloat = window!.safeAreaInsets.top
+            let bottomPadding: CGFloat = window!.safeAreaInsets.bottom
+
+            
             selectPhotoButtonConstraints = [
                 selectPhotoButton.widthAnchor.constraint(equalToConstant: 44.0),
                 selectPhotoButton.heightAnchor.constraint(equalToConstant: 44.0),
-                selectPhotoButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -24.0),
-                view.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant: (65.0 / 2) - 5.0)
+                selectPhotoButton.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -61.5),
+                view.bottomAnchor.constraint(equalTo: selectPhotoButton.bottomAnchor, constant:  ((117.0 - bottomPadding) - 44.0) / 2)
             ]
             cancelButtonConstraints = [
                 cancelButton.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 24.0),
                 view.safeAreaLayoutGuide.topAnchor.constraint(equalTo: cancelButton.topAnchor, constant: (65.0 / 2) - 20.0)
 //                view.bottomAnchor.constraint(equalTo: cancelButton.bottomAnchor, constant: (65.0 / 2) - 5.0)
             ]
-            
-            let shutterButtonBottomConstraint = view.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: 20.0)
-            shutterButtonConstraints.append(shutterButtonBottomConstraint)
+            shutterButtonConstraints = [
+                shutterButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+                shutterButton.widthAnchor.constraint(equalToConstant: 65.0),
+                shutterButton.heightAnchor.constraint(equalToConstant: 65.0),
+                view.safeAreaLayoutGuide.bottomAnchor.constraint(equalTo: shutterButton.bottomAnchor, constant: ((117.0 - bottomPadding) - 65.0) / 2)
+            ]
         }
         NSLayoutConstraint.activate(selectPhotoButtonConstraints + cancelButtonConstraints + shutterButtonConstraints + containerViewConstraints + topContainerViewConstraints)
     }
