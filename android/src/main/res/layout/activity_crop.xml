@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -7,88 +8,81 @@
 
     <ImageView
         android:id="@+id/picture_cropped"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true" />
-
-   <!--  <RelativeLay
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"> -->
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_centerInParent="true"
+        android:layout_marginBottom="65dp"
+        android:scaleType="fitXY"
+        />
 
     <ImageView
         android:id="@+id/paper"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter" />
+        android:layout_marginBottom="65dp"
+        android:scaleType="fitXY" />
 
     <com.sample.edgedetection.view.PaperRectangle
         android:id="@+id/paper_rect"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorTransparent" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:visibility="visible"
-        android:orientation="vertical">
+        android:layout_marginBottom="65dp"
+        android:background="@color/colorTransparent"
+        android:scaleType="fitStart"
+        />
 
         <LinearLayout
             android:id="@+id/layout_crop_done"
             android:layout_width="match_parent"
             android:layout_height="95dp"
-            android:layout_alignParentBottom="true"
+            android:layout_above="@+id/layout_crop_edge"
             android:background="@color/colorBarBackground"
             android:gravity="center_vertical|center_horizontal"
-            android:visibility="invisible"
-            >
+            android:visibility="gone">
+
             <LinearLayout
                 android:id="@+id/rotation_left"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                android:orientation="vertical"
                 android:layout_marginEnd="60dp"
-                >
+                android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="18.88dp"
                     android:layout_height="18.88dp"
+                    android:layout_gravity="center"
                     android:adjustViewBounds="true"
                     android:scaleType="fitXY"
-                    app:srcCompat="@drawable/ic_lp_turn_left_arrow"
-                    android:layout_gravity="center"
-                    />
+                    app:srcCompat="@drawable/ic_lp_turn_left_arrow" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/turn_left"
-                    android:textSize="17sp"
                     android:textColor="#aaaaaa"
-                    />
+                    android:textSize="17sp" />
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/rotation_right"
                 android:layout_width="wrap_content"
                 android:layout_height="45dp"
-                android:orientation="vertical"
                 android:gravity="center_horizontal"
-                >
+                android:orientation="vertical">
+
                 <ImageView
                     android:layout_width="18.88dp"
                     android:layout_height="18.88dp"
                     android:adjustViewBounds="true"
                     android:scaleType="fitXY"
-                    app:srcCompat="@drawable/ic_lp_turn_right_arrow"
-                    />
+                    app:srcCompat="@drawable/ic_lp_turn_right_arrow" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/turn_right"
-                    android:textSize="17sp"
                     android:textColor="#aaaaaa"
-                    />
+                    android:textSize="17sp" />
             </LinearLayout>
         </LinearLayout>
 
@@ -126,9 +120,5 @@
                 android:textSize="16dp"
                 android:textStyle="bold"
                 />
-
         </LinearLayout>
-
-    </LinearLayout>
-
 </RelativeLayout>
