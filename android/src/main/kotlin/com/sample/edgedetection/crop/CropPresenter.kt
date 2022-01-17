@@ -1,6 +1,7 @@
 package com.sample.edgedetection.crop
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.content.pm.PackageManager
@@ -92,6 +93,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         context.contentResolver.update(uri, values, null, null)
     }
 
+    @SuppressLint("CheckResult")
     fun crop() {
         if (picture == null) {
             Log.i(TAG, "picture null?")

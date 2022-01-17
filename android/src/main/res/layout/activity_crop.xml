@@ -10,27 +10,25 @@
         android:id="@+id/picture_cropped"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_centerInParent="true"
+        android:layout_centerVertical="true"
         android:layout_marginBottom="65dp"
-        android:scaleType="fitXY"
-        />
+        android:scaleType="fitXY" />
 
     <ImageView
         android:id="@+id/paper"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:adjustViewBounds="true"
         android:layout_marginBottom="65dp"
         android:scaleType="fitXY" />
 
     <com.sample.edgedetection.view.PaperRectangle
         android:id="@+id/paper_rect"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:layout_marginBottom="65dp"
         android:background="@color/colorTransparent"
-        android:scaleType="fitStart"
-        />
+        android:scaleType="fitStart" />
 
         <LinearLayout
             android:id="@+id/layout_crop_done"

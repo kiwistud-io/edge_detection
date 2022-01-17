@@ -21,11 +21,13 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
     private lateinit var mPresenter: CropPresenter
 
     override fun prepare() {
+        println("CropActivity - prepare")
           retake.setOnClickListener {
             finish()
         }
           next_and_done.setOnClickListener {
               if(showMenuItems){
+                  println("showMenuItems == true")
                   //true면 완료 동작으로 변경.
                   val path = mPresenter.save()
                   setResult(Activity.RESULT_OK, Intent().putExtra(SCANNED_RESULT, path))
@@ -33,6 +35,7 @@ class CropActivity : BaseActivity(), ICropView.Proxy {
                   finish()
 
               }else{
+                  println("showMenuItems == false")
                   mPresenter.crop()
                   changeMenuVisibility(true)
               }

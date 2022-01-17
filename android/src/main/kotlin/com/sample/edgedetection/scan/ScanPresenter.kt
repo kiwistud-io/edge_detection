@@ -1,5 +1,6 @@
 package com.sample.edgedetection.scan
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -129,7 +130,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
     }
 
     fun initCamera() {
-
+        println("initCamera")
         try {
             mCamera = Camera.open(Camera.CameraInfo.CAMERA_FACING_BACK)
         } catch (e: RuntimeException) {
@@ -139,6 +140,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
             return
         }
 
+        //각 카메라의 정보를 담고 있는 객체
         val cameraCharacteristics = cameraManager.getCameraCharacteristics(getBackFacingCameraId()!!)
 
         val param = mCamera?.parameters
@@ -150,11 +152,14 @@ class ScanPresenter constructor(private val context: Context, private val iView:
             getPreviewOutputSize(
                     it, cameraCharacteristics, SurfaceHolder::class.java)
         }
+        println("initCamera - size: " + size);
         // Log.d(TAG, "View finder size: ${viewFinder.width} x ${viewFinder.height}")
         Log.d(TAG, "Selected preview size: ${size?.width}${size?.height}")
         // viewFinder.setAspectRatio(previewSize.width, previewSize.height)
 
 
+        println("initCamera - size.width: " + size?.width)
+        println("initCamera - size.height: " + size?.height)
         size?.width?.toString()?.let { Log.i(TAG, it) }
         param?.setPreviewSize(size?.width ?: 1920, size?.height ?: 1080)
         val display = iView.getCurrentDisplay()
@@ -172,11 +177,20 @@ class ScanPresenter constructor(private val context: Context, private val iView:
             iView.getSurfaceView().layoutParams = surfaceParams
         }
 
+        println("initCamera - displayWidth: " + displayWidth)
+        println("initCamera - displayHeight: " + displayHeight)
+
+        println("initCamera - displayRatio: " + displayRatio)
+        println("initCamera - previewRatio: " + previewRatio)
+
+
         val supportPicSize = mCamera?.parameters?.supportedPictureSizes
         supportPicSize?.sortByDescending { it.width.times(it.height) }
         var pictureSize = supportPicSize?.find {
             it.height.toFloat().div(it.width.toFloat()) - previewRatio < 0.01
         }
+
+        println("initCamera - pictureSize: " + pictureSize)
 
         if (null == pictureSize) {
             pictureSize = supportPicSize?.get(0)
@@ -203,6 +217,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
     }
 
     fun detectEdge(pic: Mat) {
+        println("detectEdge")
         SourceManager.corners = processPicture(pic)
         Imgproc.cvtColor(pic, pic, Imgproc.COLOR_RGB2BGRA)
         SourceManager.pic = pic
@@ -210,6 +225,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
     }
 
     override fun surfaceCreated(p0: SurfaceHolder) {
+        println("surfaceCreated")
         initCamera()
     }
 
@@ -226,6 +242,7 @@ class ScanPresenter constructor(private val context: Context, private val iView:
         }
     }
 
+    @SuppressLint("CheckResult")
     override fun onPictureTaken(p0: ByteArray?, p1: Camera?) {
         Log.i(TAG, "on picture taken")
         Observable.just(p0)

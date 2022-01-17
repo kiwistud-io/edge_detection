@@ -148,6 +148,7 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
 
         if (allGranted) {
             showMessage(R.string.camera_grant)
+            println("onRequestPermissionsResult - allGranted == true")
             mPresenter.initCamera()
             mPresenter.updateCamera()
         }
@@ -168,7 +169,12 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
 
     override fun getPaperRect(): PaperRectangle = paper_rect
 
+    //이미지 가져오기 시작
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        println("onActivityResult")
+        println("requestCode:" + requestCode)
+        println("resultCode: " + resultCode)
+        println("data: " + data);
         super.onActivityResult(requestCode, resultCode, data)
 
         if (requestCode == REQUEST_CODE) {
@@ -201,9 +207,10 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
 
     @RequiresApi(Build.VERSION_CODES.N)
     fun onImageSelected(imageUri: Uri) {
-        val iStream: InputStream = contentResolver.openInputStream(imageUri)!!
+        println("onImageSelected")
+        val inputStream: InputStream = contentResolver.openInputStream(imageUri)!!
 
-        val exif = ExifInterface(iStream);
+        val exif = ExifInterface(inputStream) //이미지 메타데이터 객체
         var rotation = -1
         val orientation: Int = exif.getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
@@ -226,8 +233,11 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
 
         val inputData: ByteArray? = getBytes(contentResolver.openInputStream(imageUri)!!)
         val mat = Mat(Size(imageWidth, imageHeight), CvType.CV_8U)
+        //이미지를 픽셀별로 접근하고 싶을 때 사용하는 함수
         mat.put(0, 0, inputData)
-        val pic = Imgcodecs.imdecode(mat, Imgcodecs.CV_LOAD_IMAGE_UNCHANGED)
+        val pic = Imgcodecs.imdecode(mat, Imgcodecs.CV_LOAD_IMAGE_UNCHANGED) //원본 그대로
+        println("mat pic width:" + pic.width())
+        println("mat pic height: " + pic.height())
         if (rotation > -1) Core.rotate(pic, pic, rotation)
         mat.release()
 
