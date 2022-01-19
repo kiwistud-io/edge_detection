@@ -37,6 +37,8 @@ class PaperRectangle : View {
     private var cropMode = false
     private var latestDownX = 0.0F
     private var latestDownY = 0.0F
+    private var diffWidth = 0.0F
+    private var diffHeight = 0.0F
 
     init {
         rectPaint.color = Color.parseColor("#1CBF94")
@@ -56,7 +58,6 @@ class PaperRectangle : View {
     }
 
     fun onCornersDetected(corners: Corners) {
-
         ratioX = corners.size.width.div(measuredWidth)
         ratioY = corners.size.height.div(measuredHeight)
         tl = corners.corners[0] ?: Point()
@@ -104,7 +105,6 @@ class PaperRectangle : View {
 
         //이미지의 높이가 실제 뷰의 높이보다 크고 이미지의 너비가 디스플레이의 너비보다 작거나 같을 떄
         var standard = if (size.height > fullHeight && size.width <= displayMetrics.widthPixels) {
-            println("size.height > fullHeight && size.width <= displayMetrics.widthPixels")
             isHeightStandard = true
             fullHeight.toDouble()
         } else {
@@ -112,27 +112,37 @@ class PaperRectangle : View {
         }
 
         //높이 기준으로 비율을 정한다면
+        val imageWidth: Double
+        val imageHeight: Double
         if (isHeightStandard) {
-            println("isHeightStandard")
             ratioY = size.height.div(standard)
-            ratioX = size.width.div(size.width / ratioY)
+            imageWidth = size.width.div(ratioY)
+            imageHeight = displayMetrics.heightPixels.toDouble()
+            ratioX = size.width.div(imageWidth)
         } else {
             standard = if (size.width > displayMetrics.widthPixels) {
-                println("size.width > displayMetrics.widthPixels")
                 displayMetrics.widthPixels.toDouble()
             } else {
                 size.width
             }
-            ratioX = size.width.div(standard)
-            ratioY = size.height.div(size.height / ratioX)
 
+            ratioX = size.width.div(standard)
+            imageHeight = size.height.div(ratioX)
+            ratioY = size.height.div(imageHeight)
+            imageWidth = standard
         }
 
 
-//        ratioX = size?.width?.div(displayMetrics.widthPixels) ?: 1.0
-//        ratioY = size?.height?.div(displayMetrics.heightPixels - statusBarHeight - navigationBarHeight)
-//                ?: 1.0
+        println("deviceHeight:" + displayMetrics.heightPixels);
+        println("fullHeight: " + fullHeight)
+        val whiteSpaceWidth = displayMetrics.widthPixels - imageWidth
+        val whiteSpaceHeight = displayMetrics.heightPixels - imageHeight
+        println("imageWith: " + imageWidth)
+        println("imageHeight:" + imageHeight)
+
         resize()
+        diffWidth = (whiteSpaceWidth / 2.0).toFloat();
+        diffHeight = (whiteSpaceHeight / 2.0).toFloat()
         movePoints()
     }
 
@@ -149,16 +159,16 @@ class PaperRectangle : View {
         rectPaint.style = Paint.Style.STROKE
         canvas?.drawPath(path, rectPaint)
 
-        rectPaint.color = Color.argb(128, 255, 255, 255)
+        rectPaint.color = Color.argb(60, 28, 191, 148)
         rectPaint.strokeWidth = 0F
         rectPaint.style = Paint.Style.FILL
         canvas?.drawPath(path, rectPaint)
 
         if (cropMode) {
-            canvas?.drawCircle(tl.x.toFloat(), tl.y.toFloat(), 20F, circlePaint)
-            canvas?.drawCircle(tr.x.toFloat(), tr.y.toFloat(), 20F, circlePaint)
-            canvas?.drawCircle(bl.x.toFloat(), bl.y.toFloat(), 20F, circlePaint)
-            canvas?.drawCircle(br.x.toFloat(), br.y.toFloat(), 20F, circlePaint)
+            canvas?.drawCircle(tl.x.toFloat() + diffWidth, tl.y.toFloat()  + diffHeight, 20F, circlePaint)
+            canvas?.drawCircle(tr.x.toFloat() + diffWidth, tr.y.toFloat() + diffHeight, 20F, circlePaint)
+            canvas?.drawCircle(bl.x.toFloat() + diffWidth, bl.y.toFloat() + diffHeight, 20F, circlePaint)
+            canvas?.drawCircle(br.x.toFloat() + diffWidth, br.y.toFloat() + diffHeight, 20F, circlePaint)
         }
     }
 
@@ -192,10 +202,21 @@ class PaperRectangle : View {
 
     private fun movePoints() {
         path.reset()
-        path.moveTo(tl.x.toFloat(), tl.y.toFloat())
-        path.lineTo(tr.x.toFloat(), tr.y.toFloat())
-        path.lineTo(br.x.toFloat(), br.y.toFloat())
-        path.lineTo(bl.x.toFloat(), bl.y.toFloat())
+        path.moveTo(tl.x.toFloat() + diffWidth, tl.y.toFloat() + diffHeight)
+        path.lineTo(tr.x.toFloat() + diffWidth, tr.y.toFloat() + diffHeight)
+        path.lineTo(br.x.toFloat() + diffWidth, br.y.toFloat() + diffHeight)
+        path.lineTo(bl.x.toFloat() + diffWidth, bl.y.toFloat() + diffHeight)
+        path.close()
+        invalidate()
+    }
+
+    private fun movePoints(width: Float) {
+        println("movePoints - width: " + width)
+        path.reset()
+        path.moveTo(tl.x.toFloat() + width, tl.y.toFloat())
+        path.lineTo(tr.x.toFloat() + width, tr.y.toFloat())
+        path.lineTo(br.x.toFloat() + width, br.y.toFloat())
+        path.lineTo(bl.x.toFloat() + width, bl.y.toFloat())
         path.close()
         invalidate()
     }
