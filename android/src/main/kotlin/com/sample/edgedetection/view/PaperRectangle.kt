@@ -60,6 +60,7 @@ class PaperRectangle : View {
         circlePaint.style = Paint.Style.STROKE
     }
 
+    //안씀
     fun onCornersDetected(corners: Corners) {
         ratioX = corners.size.width.div(measuredWidth)
         ratioY = corners.size.height.div(measuredHeight)
@@ -80,21 +81,25 @@ class PaperRectangle : View {
         invalidate()
     }
 
+    //안씀
     fun onCornersNotDetected() {
         path.reset()
         invalidate()
     }
 
-    fun onCorners2Crop(corners: Corners?, size: Size?) {
-        if (size == null) {
+    fun onCorners2Crop(corners: Corners?, imageSize: Size?) {
+        if (imageSize == null) {
             return
         }
 
+        println("onCorners2Crop")
+        println("corners: ${corners}")
         cropMode = true
-        tl = corners?.corners?.get(0) ?: Point(size.width * 0.1, size.height * 0.1)
-        tr = corners?.corners?.get(1) ?: Point(size.width * 0.9, size.height * 0.1)
-        br = corners?.corners?.get(2) ?: Point(size.width * 0.9, size.height * 0.9)
-        bl = corners?.corners?.get(3) ?: Point(size.width * 0.1, size.height * 0.9)
+        tl = corners?.corners?.get(0) ?: Point(imageSize.width * 0.1, imageSize.height * 0.1)
+        tr = corners?.corners?.get(1) ?: Point(imageSize.width * 0.9, imageSize.height * 0.1)
+        br = corners?.corners?.get(2) ?: Point(imageSize.width * 0.9, imageSize.height * 0.9)
+        bl = corners?.corners?.get(3) ?: Point(imageSize.width * 0.1, imageSize.height * 0.9)
+
         val displayMetrics = DisplayMetrics()
         (context as Activity).windowManager.defaultDisplay.getMetrics(displayMetrics)
         //exclude status bar height
@@ -112,33 +117,32 @@ class PaperRectangle : View {
         var isHeightStandard = false
 
         //이미지의 높이가 실제 뷰의 높이보다 크고 이미지의 너비가 디스플레이의 너비보다 작거나 같을 떄
-        var standard = if (size.height > fullHeight && size.width <= displayMetrics.widthPixels) {
-            println("size.height > fullHeight && size.width <= displayMetrics.widthPixels")
+        var standard = if (imageSize.height > fullHeight && imageSize.width <= displayMetrics.widthPixels) {
             isHeightStandard = true
             fullHeight.toDouble()
         } else {
-            size.height
+            imageSize.height
         }
 
         //높이 기준으로 비율을 정한다면
         val imageWidth: Double
         val imageHeight: Double
         if (isHeightStandard) {
-            ratioY = size.height.div(standard)
-            imageWidth = size.width.div(ratioY)
+            ratioY = imageSize.height.div(standard)
+            imageWidth = imageSize.width.div(ratioY)
             imageHeight = displayMetrics.heightPixels.toDouble()
-            ratioX = size.width.div(imageWidth)
+            ratioX = imageSize.width.div(imageWidth)
         } else {
             extraHeight = dp2px.toDouble()
-            standard = if (size.width > displayMetrics.widthPixels) {
+            standard = if (imageSize.width > displayMetrics.widthPixels) {
                 displayMetrics.widthPixels.toDouble()
             } else {
-                size.width
+                imageSize.width
             }
 
-            ratioX = size.width.div(standard)
-            imageHeight = size.height.div(ratioX)
-            ratioY = size.height.div(imageHeight)
+            ratioX = imageSize.width.div(standard)
+            imageHeight = imageSize.height.div(ratioX)
+            ratioY = imageSize.height.div(imageHeight)
             imageWidth = standard
         }
 
@@ -148,11 +152,22 @@ class PaperRectangle : View {
         val whiteSpaceHeight = displayMetrics.heightPixels - imageHeight - extraHeight
 
         resize()
-        diffWidth = (whiteSpaceWidth / 2.0).toFloat();
+        diffWidth = (whiteSpaceWidth / 2.0).toFloat()
         diffHeight = (whiteSpaceHeight / 2.0).toFloat()
+
+        tl.x = tl.x.toFloat() + diffWidth.toDouble()
+        tl.y = tl.y.toFloat()  + diffHeight.toDouble()
+        tr.x = tr.x.toFloat() + diffWidth.toDouble()
+        tr.y = tr.y.toFloat() + diffHeight.toDouble()
+        bl.x = bl.x.toFloat() + diffWidth.toDouble()
+        bl.y = bl.y.toFloat() + diffHeight.toDouble()
+        br.x = br.x.toFloat() + diffWidth.toDouble()
+        br.y = br.y.toFloat() + diffHeight.toDouble()
+
         movePoints()
     }
 
+    //안씀
     fun getCorners2Crop(): List<Point> {
         reverseSize()
         return listOf(tl, tr, br, bl)
@@ -172,15 +187,15 @@ class PaperRectangle : View {
         canvas?.drawPath(path, rectPaint)
 
         if (cropMode) {
-            canvas?.drawCircle(tl.x.toFloat() + diffWidth, tl.y.toFloat()  + diffHeight, 20F, circlePaint)
-            canvas?.drawCircle(tr.x.toFloat() + diffWidth, tr.y.toFloat() + diffHeight, 20F, circlePaint)
-            canvas?.drawCircle(bl.x.toFloat() + diffWidth, bl.y.toFloat() + diffHeight, 20F, circlePaint)
-            canvas?.drawCircle(br.x.toFloat() + diffWidth, br.y.toFloat() + diffHeight, 20F, circlePaint)
+            //크롭 영역 꼭짓점 그리기
+            canvas?.drawCircle(tl.x.toFloat(), tl.y.toFloat(), 20F, circlePaint)
+            canvas?.drawCircle(tr.x.toFloat(), tr.y.toFloat(), 20F, circlePaint)
+            canvas?.drawCircle(bl.x.toFloat(), bl.y.toFloat(), 20F, circlePaint)
+            canvas?.drawCircle(br.x.toFloat(), br.y.toFloat(), 20F, circlePaint)
         }
     }
 
     override fun onTouchEvent(event: MotionEvent?): Boolean {
-
         if (!cropMode) {
             return false
         }
@@ -202,17 +217,19 @@ class PaperRectangle : View {
     }
 
     private fun calculatePoint2Move(downX: Float, downY: Float) {
+        println("calculatePoint2Move")
         val points = listOf(tl, tr, br, bl)
         point2Move = points.minByOrNull { abs((it.x - downX).times(it.y - downY)) }
                 ?: tl
     }
 
+    //크롭 영역 선 그리기
     private fun movePoints() {
         path.reset()
-        path.moveTo(tl.x.toFloat() + diffWidth, tl.y.toFloat() + diffHeight)
-        path.lineTo(tr.x.toFloat() + diffWidth, tr.y.toFloat() + diffHeight)
-        path.lineTo(br.x.toFloat() + diffWidth, br.y.toFloat() + diffHeight)
-        path.lineTo(bl.x.toFloat() + diffWidth, bl.y.toFloat() + diffHeight)
+        path.moveTo(tl.x.toFloat(), tl.y.toFloat())
+        path.lineTo(tr.x.toFloat(), tr.y.toFloat())
+        path.lineTo(br.x.toFloat(), br.y.toFloat())
+        path.lineTo(bl.x.toFloat(), bl.y.toFloat())
         path.close()
         invalidate()
     }
@@ -229,15 +246,16 @@ class PaperRectangle : View {
         bl.y = bl.y.div(ratioY)
     }
 
+    //안씀
     private fun reverseSize() {
-        tl.x = tl.x.times(ratioX)
-        tl.y = tl.y.times(ratioY)
-        tr.x = tr.x.times(ratioX)
-        tr.y = tr.y.times(ratioY)
-        br.x = br.x.times(ratioX)
-        br.y = br.y.times(ratioY)
-        bl.x = bl.x.times(ratioX)
-        bl.y = bl.y.times(ratioY)
+        tl.x = (tl.x - diffWidth).times(ratioX)
+        tl.y = (tl.y - diffHeight).times(ratioY)
+        tr.x = (tr.x - diffWidth).times(ratioX)
+        tr.y = (tr.y - diffHeight).times(ratioY)
+        br.x = (br.x - diffWidth).times(ratioX)
+        br.y = (br.y - diffHeight).times(ratioY)
+        bl.x = (bl.x - diffWidth).times(ratioX)
+        bl.y = (bl.y - diffHeight).times(ratioY)
     }
 
     private fun getNavigationBarHeight(pContext: Context): Int {
@@ -257,7 +275,7 @@ class PaperRectangle : View {
     }
 
 
-    fun convertDpToPx(context: Context, dp:Int): Int {
+    private fun convertDpToPx(context: Context, dp:Int): Int {
         val density= context.resources.displayMetrics.density
         return (dp * density).roundToInt()
     }
