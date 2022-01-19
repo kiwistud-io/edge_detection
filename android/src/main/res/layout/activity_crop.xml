@@ -21,12 +21,12 @@
         android:layout_above="@+id/layout_crop_edge"
         android:layout_centerInParent="true"
         android:adjustViewBounds="true"
-        android:scaleType="fitCenter" />
+        android:scaleType="centerInside" />
 
     <com.sample.edgedetection.view.PaperRectangle
         android:id="@+id/paper_rect"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_marginBottom="65dp"
         android:background="@color/colorTransparent"
         android:scaleType="fitXY"
@@ -105,7 +105,7 @@
                 android:minWidth="0dp"
                 android:background="#CCCCCC"
                 android:text="@string/retake"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 />
 
@@ -118,7 +118,7 @@
                 android:minHeight="0dp"
                 android:minWidth="0dp"
                 android:text="@string/next"
-                android:textSize="16dp"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 />
         </LinearLayout>

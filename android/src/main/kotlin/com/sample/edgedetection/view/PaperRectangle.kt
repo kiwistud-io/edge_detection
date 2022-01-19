@@ -13,6 +13,7 @@ import com.sample.edgedetection.processor.TAG
 import org.opencv.core.Point
 import org.opencv.core.Size
 import kotlin.math.abs
+import kotlin.math.roundToInt
 
 
 class PaperRectangle : View {
@@ -37,7 +38,9 @@ class PaperRectangle : View {
     private var cropMode = false
     private var latestDownX = 0.0F
     private var latestDownY = 0.0F
+    //이미지 좌우의 빈 공간 px(white space)
     private var diffWidth = 0.0F
+    //이미지 상하의 빈 공간 px(white space)
     private var diffHeight = 0.0F
 
     init {
@@ -99,12 +102,18 @@ class PaperRectangle : View {
         //exclude navigation bar height
         val navigationBarHeight = getNavigationBarHeight(context)
 
+        //가로가 이미지 영역애 꽉찼을 때의 값
+        var extraHeight = 0.0
+
+        //버튼 레이아웃 높이의 실제 픽셀(디바이스 해상도에 맞춘)
+        val dp2px = convertDpToPx(context, 65)
         val fullHeight = displayMetrics.heightPixels - statusBarHeight - navigationBarHeight
 
         var isHeightStandard = false
 
         //이미지의 높이가 실제 뷰의 높이보다 크고 이미지의 너비가 디스플레이의 너비보다 작거나 같을 떄
         var standard = if (size.height > fullHeight && size.width <= displayMetrics.widthPixels) {
+            println("size.height > fullHeight && size.width <= displayMetrics.widthPixels")
             isHeightStandard = true
             fullHeight.toDouble()
         } else {
@@ -120,6 +129,7 @@ class PaperRectangle : View {
             imageHeight = displayMetrics.heightPixels.toDouble()
             ratioX = size.width.div(imageWidth)
         } else {
+            extraHeight = dp2px.toDouble()
             standard = if (size.width > displayMetrics.widthPixels) {
                 displayMetrics.widthPixels.toDouble()
             } else {
@@ -132,13 +142,10 @@ class PaperRectangle : View {
             imageWidth = standard
         }
 
-
-        println("deviceHeight:" + displayMetrics.heightPixels);
-        println("fullHeight: " + fullHeight)
+        //디바이스의 너비에서 리사이징 된 이미지의 width 픽셀을 뺀 값
         val whiteSpaceWidth = displayMetrics.widthPixels - imageWidth
-        val whiteSpaceHeight = displayMetrics.heightPixels - imageHeight
-        println("imageWith: " + imageWidth)
-        println("imageHeight:" + imageHeight)
+        //디바이스의 높이에서 리사이징 된 이미지의 height 픽셀을 뺀 값 (가로가 이미지 영역애 꽉찼을 땐 하단 버턴의 height 만큼 추가로 뺌)
+        val whiteSpaceHeight = displayMetrics.heightPixels - imageHeight - extraHeight
 
         resize()
         diffWidth = (whiteSpaceWidth / 2.0).toFloat();
@@ -261,7 +268,7 @@ class PaperRectangle : View {
     }
 
 
-    fun dp2px(context: Context, dp:Int): Int {
+    fun convertDpToPx(context: Context, dp:Int): Int {
         val density= context.resources.displayMetrics.density
         return (dp * density).roundToInt()
     }
