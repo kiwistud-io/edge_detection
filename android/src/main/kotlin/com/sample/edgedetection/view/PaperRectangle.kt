@@ -217,17 +217,6 @@ class PaperRectangle : View {
         invalidate()
     }
 
-    private fun movePoints(width: Float) {
-        println("movePoints - width: " + width)
-        path.reset()
-        path.moveTo(tl.x.toFloat() + width, tl.y.toFloat())
-        path.lineTo(tr.x.toFloat() + width, tr.y.toFloat())
-        path.lineTo(br.x.toFloat() + width, br.y.toFloat())
-        path.lineTo(bl.x.toFloat() + width, bl.y.toFloat())
-        path.close()
-        invalidate()
-    }
-
 
     private fun resize() {
         tl.x = tl.x.div(ratioX)
