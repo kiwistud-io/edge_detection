@@ -39,7 +39,7 @@ class PaperRectangle : View {
     private var latestDownY = 0.0F
 
     init {
-        rectPaint.color = Color.argb(128, 255, 255, 255)
+        rectPaint.color = Color.parseColor("#1CBF94")
         rectPaint.isAntiAlias = true
         rectPaint.isDither = true
         rectPaint.strokeWidth = 6F
@@ -48,7 +48,7 @@ class PaperRectangle : View {
         rectPaint.strokeCap = Paint.Cap.ROUND      // set the paint cap to round too
         rectPaint.pathEffect = CornerPathEffect(10f)
 
-        circlePaint.color = Color.WHITE
+        circlePaint.color = Color.parseColor("#1CBF94")
         circlePaint.isDither = true
         circlePaint.isAntiAlias = true
         circlePaint.strokeWidth = 4F
@@ -97,9 +97,41 @@ class PaperRectangle : View {
         val statusBarHeight = getStatusBarHeight(context)
         //exclude navigation bar height
         val navigationBarHeight = getNavigationBarHeight(context)
-        ratioX = size?.width?.div(displayMetrics.widthPixels) ?: 1.0
-        ratioY = size?.height?.div(displayMetrics.heightPixels - statusBarHeight - navigationBarHeight)
-                ?: 1.0
+
+        val fullHeight = displayMetrics.heightPixels - statusBarHeight - navigationBarHeight
+
+        var isHeightStandard = false
+
+        //이미지의 높이가 실제 뷰의 높이보다 크고 이미지의 너비가 디스플레이의 너비보다 작거나 같을 떄
+        var standard = if (size.height > fullHeight && size.width <= displayMetrics.widthPixels) {
+            println("size.height > fullHeight && size.width <= displayMetrics.widthPixels")
+            isHeightStandard = true
+            fullHeight.toDouble()
+        } else {
+            size.height
+        }
+
+        //높이 기준으로 비율을 정한다면
+        if (isHeightStandard) {
+            println("isHeightStandard")
+            ratioY = size.height.div(standard)
+            ratioX = size.width.div(size.width / ratioY)
+        } else {
+            standard = if (size.width > displayMetrics.widthPixels) {
+                println("size.width > displayMetrics.widthPixels")
+                displayMetrics.widthPixels.toDouble()
+            } else {
+                size.width
+            }
+            ratioX = size.width.div(standard)
+            ratioY = size.height.div(size.height / ratioX)
+
+        }
+
+
+//        ratioX = size?.width?.div(displayMetrics.widthPixels) ?: 1.0
+//        ratioY = size?.height?.div(displayMetrics.heightPixels - statusBarHeight - navigationBarHeight)
+//                ?: 1.0
         resize()
         movePoints()
     }
@@ -112,7 +144,7 @@ class PaperRectangle : View {
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
 
-        rectPaint.color = Color.WHITE
+        rectPaint.color = Color.parseColor("#1CBF94")
         rectPaint.strokeWidth = 6F
         rectPaint.style = Paint.Style.STROKE
         canvas?.drawPath(path, rectPaint)
