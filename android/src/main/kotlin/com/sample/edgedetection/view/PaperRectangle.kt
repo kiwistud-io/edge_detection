@@ -259,4 +259,10 @@ class PaperRectangle : View {
             resources.getDimensionPixelSize(resourceId)
         } else 0
     }
+
+
+    fun dp2px(context: Context, dp:Int): Int {
+        val density= context.resources.displayMetrics.density
+        return (dp * density).roundToInt()
+    }
 }
