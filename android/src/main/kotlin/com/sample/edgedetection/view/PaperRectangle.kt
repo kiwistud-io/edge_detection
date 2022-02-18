@@ -38,9 +38,9 @@ class PaperRectangle : View {
     private var cropMode = false
     private var latestDownX = 0.0F
     private var latestDownY = 0.0F
-    //이미지 좌우의 빈 공간 px(white space)
+    //이미지 가로 여백 길이에 반을 나눈 px값(white space)
     private var diffWidth = 0.0F
-    //이미지 상하의 빈 공간 px(white space)
+    //이미지 세로 여백 길이에 반을 나눈 px값(white space)
     private var diffHeight = 0.0F
 
     init {
@@ -246,7 +246,6 @@ class PaperRectangle : View {
         bl.y = bl.y.div(ratioY)
     }
 
-    //안씀
     private fun reverseSize() {
         tl.x = (tl.x - diffWidth).times(ratioX)
         tl.y = (tl.y - diffHeight).times(ratioY)
