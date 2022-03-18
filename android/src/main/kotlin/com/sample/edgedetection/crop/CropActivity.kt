@@ -14,13 +14,13 @@ import com.sample.edgedetection.view.PaperRectangle
 import kotlinx.android.synthetic.main.activity_crop.*
 
 
-class CropActivity : BaseActivity(), ICropView.Proxy {
+  class CropActivity : BaseActivity(), ICropView.Proxy {
 
     private var showMenuItems = false
 
     private lateinit var mPresenter: CropPresenter
 
-    override fun prepare() {
+    override  fun prepare() {
           retake.setOnClickListener {
             finish()
         }

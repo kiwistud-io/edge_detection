@@ -92,7 +92,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         context.contentResolver.update(uri, values, null, null)
     }
 
-    fun crop() {
+     fun crop() {
         if (picture == null) {
             Log.i(TAG, "picture null?")
             return
@@ -165,7 +165,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         iCropView.getCroppedPaper().setImageBitmap(croppedBitmap)
     }
 
-    fun rotate() {
+     fun rotate() {
         if (croppedBitmap == null && enhancedPicture == null) {
             Log.i(TAG, "picture null?")
             return
@@ -192,6 +192,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         enhancedPicture = rotateBitmap
         croppedBitmap = croppedBitmap?.rotateInt(rotateBitmapDegree)
     }
+
       fun rotateRight() {
         if (croppedBitmap == null && enhancedPicture == null) {
             Log.i(TAG, "picture null?")
@@ -209,7 +210,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         }
 
         Log.i(TAG, "ROTATEBITMAPDEGREE --> $rotateBitmapDegreeR")
-
+        
         rotateBitmap = rotateBitmap?.rotateInt(rotateBitmapDegreeR)
 
         iCropView.getCroppedPaper().setImageBitmap(rotateBitmap)
@@ -218,9 +219,10 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         croppedBitmap = croppedBitmap?.rotateInt(rotateBitmapDegreeR)
     }
 
+
     fun proceed(): String? {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(context, "please grant write file permission and trya gain", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "please grant write file permission and try again", Toast.LENGTH_SHORT).show()
             return null
         }
 
@@ -248,7 +250,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
         return null
     }
 
-    fun save(): String? {
+     fun save(): String? {
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             Toast.makeText(context, "please grant write file permission and try again", Toast.LENGTH_SHORT).show()
         } else {
@@ -266,15 +268,15 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
                 dir.mkdirs()
             }
 
-                //            if(rotateBitmap != null) {
-                //                if (enhancedPicture != null) {
-                //                    enhancedPicture = rotateBitmap
-                //                    Log.i(TAG, "enhancedPicture Changed")
-                //                } else if(croppedBitmap != null){
-                //                    croppedBitmap = rotateBitmap
-                //                    Log.i(TAG, "rotateBitmap Changed")
-                //                }
-                //            }
+//            if(rotateBitmap != null) {
+//                if (enhancedPicture != null) {
+//                    enhancedPicture = rotateBitmap
+//                    Log.i(TAG, "enhancedPicture Changed")
+//                } else if(croppedBitmap != null){
+//                    croppedBitmap = rotateBitmap
+//                    Log.i(TAG, "rotateBitmap Changed")
+//                }
+//            }
 
             val rotatePic = rotateBitmap
             if (null != rotatePic) {
@@ -298,6 +300,7 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
                     addImageToGallery("enhance_${SystemClock.currentThreadTimeMillis()}.jpeg", enhancedPicture!!, this.context)
                     val file = File(dir, "enhance_${SystemClock.currentThreadTimeMillis()}.jpeg")
                     val outStream = FileOutputStream(file)
+                    Log.i(TAG, "pic bitmap size "+ pic.byteCount)
                     pic.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
                     outStream.flush()
                     outStream.close()
@@ -313,7 +316,8 @@ class CropPresenter(private val context: Context, private val iCropView: ICropVi
                         addImageToGallery("crop_${SystemClock.currentThreadTimeMillis()}.jpeg", croppedBitmap!!, this.context)
                         val file = File(dir, "crop_${SystemClock.currentThreadTimeMillis()}.jpeg")
                         val outStream = FileOutputStream(file)
-                        cropPic.compress(Bitmap.CompressFormat.JPEG, 100, outStream)
+                        Log.i(TAG, "cropPic bitmap size "+ cropPic.byteCount )
+                        cropPic.compress(Bitmap.CompressFormat.JPEG, 100, outStream) //압축
                         outStream.flush()
                         outStream.close()
                         cropPic.recycle()

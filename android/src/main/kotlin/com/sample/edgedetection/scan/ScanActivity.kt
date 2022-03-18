@@ -1,9 +1,14 @@
 package com.sample.edgedetection.scan
 
+//import android.media.ExifInterface
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.media.ExifInterface
+import android.graphics.Bitmap
+import android.graphics.ImageDecoder
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
@@ -11,15 +16,18 @@ import android.util.Log
 import android.view.Display
 import android.view.MenuItem
 import android.view.SurfaceView
+import android.webkit.MimeTypeMap
+import androidx.activity.result.ActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.exifinterface.media.ExifInterface
 import com.sample.edgedetection.R
 import com.sample.edgedetection.REQUEST_CODE
 import com.sample.edgedetection.SCANNED_RESULT
 import com.sample.edgedetection.base.BaseActivity
 import com.sample.edgedetection.view.PaperRectangle
-
 import kotlinx.android.synthetic.main.activity_scan.*
 import org.opencv.android.OpenCVLoader
 import org.opencv.core.Core
@@ -30,6 +38,8 @@ import org.opencv.imgcodecs.Imgcodecs
 import java.io.ByteArrayOutputStream
 import java.io.IOException
 import java.io.InputStream
+import java.util.*
+
 
 class ScanActivity : BaseActivity(), IScanView.Proxy {
 
@@ -94,11 +104,50 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
             }
         }
 
+        //갤러리에서 이미지 선택 후 결과 받는 함수
+        val startForResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+                result: ActivityResult -> if ( result.resultCode == Activity.RESULT_OK) {
+                    val intent = result.data // Handle the Intent //do stuff here
+                    val uri: Uri = intent!!.data!!
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val mimeTypeMap= MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri))
+                if(mimeTypeMap.equals("jpg") || mimeTypeMap.equals("jpeg")){
+                    onImageSelected(uri)
+                }else{
+                    //jpg가 아닐 경우 파일 포맷 변환
+                    try {
+                        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+                            val source = ImageDecoder.createSource(this.contentResolver, uri)
+                            val bitmap = ImageDecoder.decodeBitmap(source)
+                            val bitmapUri = getImageUri(this,bitmap)
+                                onImageSelected(bitmapUri!!)
+                        }else{
+                            val source =  MediaStore.Images.Media.getBitmap(contentResolver,uri)
+                            val bitmapUri = getImageUri(this,source)
+                            onImageSelected(bitmapUri!!)
+                        }
+                    }catch (e:Exception){
+                        Log.e(TAG, e.toString())
+                    }
+                }
+            }
+        } }
+
         gallery.setOnClickListener {
-            val gallery = Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI)
-            ActivityCompat.startActivityForResult(this, gallery, 1, null);
-        };
+            val gallery = Intent(Intent.ACTION_PICK)
+            gallery.data=MediaStore.Images.Media.INTERNAL_CONTENT_URI
+            gallery.type="image/*"
+            startForResult.launch(gallery)
+            }
     }
+
+    private fun getImageUri(inContext: Context?, inImage: Bitmap?): Uri? {
+        val bytes = ByteArrayOutputStream()
+        inImage?.compress(Bitmap.CompressFormat.JPEG, 100, bytes)
+        val path = MediaStore.Images.Media.insertImage(inContext?.contentResolver, inImage, "Title" + " - " + Calendar.getInstance().getTime(), null)
+        return Uri.parse(path)
+    }
+
 
 
     override fun onStart() {
@@ -184,10 +233,25 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
         if (requestCode == 1 && resultCode == Activity.RESULT_OK) {
             val uri: Uri = data!!.data!!
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                onImageSelected(uri)
+                val mimeTypeMap= MimeTypeMap.getSingleton().getExtensionFromMimeType(contentResolver.getType(uri))
+                if(mimeTypeMap.equals("jpg") || mimeTypeMap.equals("jpeg")){
+                    onImageSelected(uri)
+                }else{
+                    // 다이얼로그를 생성하기 위해 Builder 클래스 생성자를 이용해 줍니다.
+                    val builder = AlertDialog.Builder(this, R.style.AppCompatAlertDialog)
+                    builder.setTitle("사용 불가 이미지 파일")
+                        .setMessage("jpg 또는 jpeg 파일을 선택해주세요.")
+                        .setPositiveButton("확인",
+                            DialogInterface.OnClickListener { dialog, id ->
+                            })
+                    // 다이얼로그를 띄워주기
+                    builder.show()
+                }
+
             }
         }
     }
+
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
 
@@ -202,36 +266,39 @@ class ScanActivity : BaseActivity(), IScanView.Proxy {
     @RequiresApi(Build.VERSION_CODES.N)
     fun onImageSelected(imageUri: Uri) {
         val iStream: InputStream = contentResolver.openInputStream(imageUri)!!
-
-        val exif = ExifInterface(iStream);
-        var rotation = -1
-        val orientation: Int = exif.getAttributeInt(
+        try{
+             val exif = ExifInterface(iStream)
+            Log.i(TAG, "onImageSelected: 3 :: "+iStream.read())
+            var rotation = -1
+            val orientation: Int = exif.getAttributeInt(
                 ExifInterface.TAG_ORIENTATION,
                 ExifInterface.ORIENTATION_UNDEFINED)
-        when (orientation) {
-            ExifInterface.ORIENTATION_ROTATE_90 -> rotation = Core.ROTATE_90_CLOCKWISE
-            ExifInterface.ORIENTATION_ROTATE_180 -> rotation = Core.ROTATE_180
-            ExifInterface.ORIENTATION_ROTATE_270 -> rotation = Core.ROTATE_90_COUNTERCLOCKWISE
+            when (orientation) {
+                ExifInterface.ORIENTATION_ROTATE_90 -> rotation = Core.ROTATE_90_CLOCKWISE
+                ExifInterface.ORIENTATION_ROTATE_180 -> rotation = Core.ROTATE_180
+                ExifInterface.ORIENTATION_ROTATE_270 -> rotation = Core.ROTATE_90_COUNTERCLOCKWISE
+            }
+            Log.i(TAG, "rotation:" + rotation)
+
+            var imageWidth = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0).toDouble()
+            var imageHeight = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0).toDouble()
+            if (rotation == Core.ROTATE_90_CLOCKWISE || rotation == Core.ROTATE_90_COUNTERCLOCKWISE) {
+                imageWidth = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0).toDouble()
+                imageHeight = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0).toDouble()
+            }
+            Log.i(TAG, "width:" + imageWidth)
+            Log.i(TAG, "height:" + imageHeight)
+
+            val inputData: ByteArray? = getBytes(contentResolver.openInputStream(imageUri)!!)
+            val mat = Mat(Size(imageWidth, imageHeight), CvType.CV_8U)
+            mat.put(0, 0, inputData)
+            val pic = Imgcodecs.imdecode(mat, Imgcodecs.CV_LOAD_IMAGE_UNCHANGED)
+            if (rotation > -1) Core.rotate(pic, pic, rotation)
+            mat.release()
+            mPresenter.detectEdge(pic)
+        }catch(e: Throwable){
+            Log.d(TAG, "ExifInterface:" + e.message)
         }
-        Log.i(TAG, "rotation:" + rotation)
-
-        var imageWidth = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0).toDouble()
-        var imageHeight = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0).toDouble()
-        if (rotation == Core.ROTATE_90_CLOCKWISE || rotation == Core.ROTATE_90_COUNTERCLOCKWISE) {
-            imageWidth = exif.getAttributeInt(ExifInterface.TAG_IMAGE_LENGTH, 0).toDouble()
-            imageHeight = exif.getAttributeInt(ExifInterface.TAG_IMAGE_WIDTH, 0).toDouble()
-        }
-        Log.i(TAG, "width:" + imageWidth)
-        Log.i(TAG, "height:" + imageHeight)
-
-        val inputData: ByteArray? = getBytes(contentResolver.openInputStream(imageUri)!!)
-        val mat = Mat(Size(imageWidth, imageHeight), CvType.CV_8U)
-        mat.put(0, 0, inputData)
-        val pic = Imgcodecs.imdecode(mat, Imgcodecs.CV_LOAD_IMAGE_UNCHANGED)
-        if (rotation > -1) Core.rotate(pic, pic, rotation)
-        mat.release()
-
-        mPresenter.detectEdge(pic);
     }
 
     @Throws(IOException::class)
