@@ -8,17 +8,23 @@
         android:allowBackup="true"
         android:requestLegacyExternalStorage="true"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        android:exported="false"
+        >
         <activity
             android:name=".scan.ScanActivity"
             android:label="@string/scan"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" 
+            android:exported="false"
+            />
         <activity
             android:name=".crop.CropActivity"
             android:label="@string/crop"
             android:launchMode="singleTask"
-            android:screenOrientation="portrait" />
+            android:screenOrientation="portrait" 
+            android:exported="false"
+            />
     </application>
 
 </manifest>
